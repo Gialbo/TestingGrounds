@@ -62,6 +62,7 @@ protected:
 
 public:
 	//Fires a projectile
+	UFUNCTION(BlueprintCallable, Category = Firing)
 	void OnFire();
 
 };
