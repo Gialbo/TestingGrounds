@@ -29,6 +29,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void PlaceActors(TSubclassOf<AActor> ToSpawn, float MinScale = 1, float MaxScale = 1, int MinSpawn = 1, int MaxSpawn = 1, float Radius = 500);
 
+	UFUNCTION(BlueprintCallable, Category = "AI")
+	void PlaceAIPawns(TSubclassOf<APawn> ToSpawn, int MinSpawn = 1, int MaxSpawn = 1, float Radius = 500);
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -62,6 +66,8 @@ private:
 	bool FindEmptyLocation(FVector& OutLocation, float Radius);
 
 	void PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition);
+
+	void PlaceAIPawn(TSubclassOf<APawn> ToSpawn, FSpawnPosition SpawnPosition);
 
 	bool CanSpawnAtLocation(FVector Location, float Radius);
 
