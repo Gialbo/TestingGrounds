@@ -23,19 +23,28 @@ ATile::ATile()
 
 void ATile::PlaceActors(TSubclassOf<AActor> ToSpawn, float MinScale, float MaxScale, int MinSpawn, int MaxSpawn, float Radius)
 {
+	TArray<FSpawnPosition> SpawnPositions;
+	RandomSpawnPositions(MinSpawn, MaxSpawn, MinScale, MaxScale, Radius, SpawnPositions);
 
+	for (FSpawnPosition SpawnPosition : SpawnPositions)
+	{
+		PlaceActor(ToSpawn, SpawnPosition);
+	}
+}
+
+void ATile::RandomSpawnPositions(int MinSpawn, int MaxSpawn, float MinScale, float MaxScale, float Radius, TArray<FSpawnPosition> &SpawnPositions)
+{
 	int NumberToSpawn = FMath::RandRange(MinSpawn, MaxSpawn);
 	for (size_t i = 0; i < NumberToSpawn; i++)
 	{
+		FSpawnPosition SpawnPosition;
+		SpawnPosition.Rotation = FMath::RandRange(-180.f, 180.f);
+		SpawnPosition.Scale = FMath::RandRange(MinScale, MaxScale);
 
-		float RandomRotation = FMath::RandRange(-180.f, 180.f);
-		float RandomScale = FMath::RandRange(MinScale, MaxScale);
-		Radius *= RandomScale;
-
-		FVector SpawnPoint;
-		bool found = FindEmptyLocation(SpawnPoint, Radius);
-		if (found) {
-			PlaceActor(ToSpawn, SpawnPoint, RandomRotation, RandomScale);
+		bool found = FindEmptyLocation(SpawnPosition.Location, Radius * SpawnPosition.Scale);
+		if (found)
+		{
+			SpawnPositions.Add(SpawnPosition);
 		}
 	}
 }
@@ -93,13 +102,13 @@ bool ATile::FindEmptyLocation(FVector& OutLocation, float Radius)
 	return false;
 }
 
-void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FVector SpawnPoint, float Rotation, float Scale)
+void ATile::PlaceActor(TSubclassOf<AActor> ToSpawn, FSpawnPosition SpawnPosition)
 {
 	AActor* Spawned = GetWorld()->SpawnActor<AActor>(ToSpawn);
-	Spawned->SetActorRelativeLocation(SpawnPoint);
+	Spawned->SetActorRelativeLocation(SpawnPosition.Location);
 	Spawned->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::KeepRelative, false));
-	Spawned->SetActorRotation(FRotator(0, Rotation, 0));
-	Spawned->SetActorScale3D(FVector(Scale));
+	Spawned->SetActorRotation(FRotator(0, SpawnPosition.Rotation, 0));
+	Spawned->SetActorScale3D(FVector(SpawnPosition.Scale));
 }
 
 bool ATile::CanSpawnAtLocation(FVector Location, float Radius)
