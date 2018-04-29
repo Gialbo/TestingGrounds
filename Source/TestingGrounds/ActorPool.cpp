@@ -10,19 +10,24 @@ UActorPool::UActorPool()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
 }
 
 AActor * UActorPool::Checkout()
 {
-
-	return nullptr;
+	if (Pool.Num() == 0)
+	{
+		return nullptr;
+	}
+	return Pool.Pop();
 }
 
 void UActorPool::Return(AActor * ActorToReturn)
 {
+	Add(ActorToReturn);
 }
 
 void UActorPool::Add(AActor * ActorToAdd)
 {
+	Pool.Push(ActorToAdd);
+	UE_LOG(LogTemp, Warning, TEXT("Pool.Num = %d"), Pool.Num());
 }
